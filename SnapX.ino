@@ -2,7 +2,6 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_ST7735.h>
 #include <SPI.h>
-#include <TJpg_Decoder.h>
 
 #define TFT_CS   13
 #define TFT_RST  2
@@ -29,11 +28,6 @@ Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RS
 #define HREF_GPIO_NUM   23
 #define PCLK_GPIO_NUM   22
 
-bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t *bitmap) {
-  tft.drawRGBBitmap(x, y, bitmap, w, h);
-  return true;
-}
-
 void startCamera() {
   camera_config_t config;
   config.ledc_channel = LEDC_CHANNEL_0;
@@ -55,9 +49,8 @@ void startCamera() {
   config.pin_pwdn = PWDN_GPIO_NUM;
   config.pin_reset = RESET_GPIO_NUM;
   config.xclk_freq_hz = 20000000;
-  config.pixel_format = PIXFORMAT_JPEG;
-  config.frame_size = FRAMESIZE_QVGA;
-  config.jpeg_quality = 12;
+  config.pixel_format = PIXFORMAT_RGB565;
+  config.frame_size = FRAMESIZE_QQVGA;
   config.fb_count = 2;
 
   esp_err_t err = esp_camera_init(&config);
@@ -75,12 +68,9 @@ void setup() {
   tft.initR(INITR_BLACKTAB);
   tft.setRotation(1);
   tft.fillScreen(ST77XX_BLACK);
+  tft.setSPISpeed(20000000);
 
   startCamera();
-
-  TJpgDec.setJpgScale(2);
-  TJpgDec.setSwapBytes(false);
-  TJpgDec.setCallback(tft_output);
 
   Serial.println("Setup complete, entering live loop");
 }
@@ -88,10 +78,10 @@ void setup() {
 void loop() {
   camera_fb_t *fb = esp_camera_fb_get();
   if (!fb) {
-    Serial.println("Capture failed");
     return;
   }
 
-  TJpgDec.drawJpg(0, 0, fb->buf, fb->len);
+  tft.drawRGBBitmap(0, 0, (uint16_t*)fb->buf, 160, 120);
+
   esp_camera_fb_return(fb);
 }
