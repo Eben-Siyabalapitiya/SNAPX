@@ -66,7 +66,7 @@ void setup() {
   delay(1000);
 
   tft.initR(INITR_BLACKTAB);
-  tft.setRotation(1);
+  tft.setRotation(0);
   tft.fillScreen(ST77XX_BLACK);
   tft.setSPISpeed(20000000);
 
@@ -81,7 +81,10 @@ void loop() {
     return;
   }
 
-  tft.drawRGBBitmap(0, 0, (uint16_t*)fb->buf, 160, 120);
+  tft.startWrite();
+  tft.setAddrWindow(0, 0, fb->width, fb->height);
+  tft.writePixels((uint16_t*)fb->buf, fb->width * fb->height);
+  tft.endWrite();
 
   esp_camera_fb_return(fb);
 }
