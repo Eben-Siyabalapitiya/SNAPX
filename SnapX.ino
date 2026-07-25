@@ -9,7 +9,13 @@
 #define TFT_SCLK 14
 #define TFT_MOSI 15
 
-Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST);
+SPIClass tftSPI(HSPI);
+Adafruit_ST7735 tft = Adafruit_ST7735(&tftSPI, TFT_CS, TFT_DC, TFT_RST);
+
+#define FRAME_W 160
+#define FRAME_H 120
+
+#define Y_OFFSET ((128 - FRAME_H) / 2)
 
 #define PWDN_GPIO_NUM   32
 #define RESET_GPIO_NUM  -1
@@ -52,6 +58,7 @@ void startCamera() {
   config.pixel_format = PIXFORMAT_RGB565;
   config.frame_size = FRAMESIZE_QQVGA;
   config.fb_count = 2;
+  config.grab_mode = CAMERA_GRAB_LATEST;
 
   esp_err_t err = esp_camera_init(&config);
   if (err != ESP_OK) {
@@ -65,10 +72,11 @@ void setup() {
   Serial.begin(115200);
   delay(1000);
 
+  tftSPI.begin(TFT_SCLK, -1, TFT_MOSI, -1);
   tft.initR(INITR_BLACKTAB);
-  tft.setRotation(0);
+  tft.setRotation(1);
   tft.fillScreen(ST77XX_BLACK);
-  tft.setSPISpeed(20000000);
+  tft.setSPISpeed(27000000);
 
   startCamera();
 
@@ -81,10 +89,12 @@ void loop() {
     return;
   }
 
-  tft.startWrite();
-  tft.setAddrWindow(0, 0, fb->width, fb->height);
-  tft.writePixels((uint16_t*)fb->buf, fb->width * fb->height);
-  tft.endWrite();
+  if (fb->width == FRAME_W && fb->height == FRAME_H) {
+    tft.startWrite();
+    tft.setAddrWindow(0, Y_OFFSET, FRAME_W, FRAME_H);
+    tft.writePixels((uint16_t*)fb->buf, fb->width * fb->height, true, true);
+    tft.endWrite();
+  }
 
   esp_camera_fb_return(fb);
 }
