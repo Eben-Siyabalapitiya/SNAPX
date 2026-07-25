@@ -79,7 +79,7 @@ void setup() {
   startCamera();
 
   TJpgDec.setJpgScale(2);
-  TJpgDec.setSwapBytes(true);
+  TJpgDec.setSwapBytes(false);
   TJpgDec.setCallback(tft_output);
 
   Serial.println("Setup complete, entering live loop");
