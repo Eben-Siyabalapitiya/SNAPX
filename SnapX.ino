@@ -54,10 +54,10 @@ Adafruit_ST7735 tft = Adafruit_ST7735(&tftSPI, TFT_CS, TFT_DC, TFT_RST);
 #define DEBOUNCE_MS    50
 
 #define PHOTO_DIR    "/photos"
-#define JPEG_QUALITY 85
+#define JPEG_QUALITY 95
 
-#define AP_SSID     "CAMX-Photos"
-#define AP_PASSWORD "camera123"
+#define AP_SSID     "SNAPX"
+#define AP_PASSWORD "1523"
 
 WebServer server(80);
 
@@ -127,7 +127,7 @@ void setup() {
   delay(600);
 
   tft.fillScreen(C_BG);
-  Serial.println("CAMX ready");
+  Serial.println("SNAPX ready");
 }
 
 void splashScreen() {
@@ -140,9 +140,9 @@ void splashScreen() {
   tft.setTextColor(C_WHITE);
   int16_t x1, y1;
   uint16_t w, h;
-  tft.getTextBounds("CAMX", 0, 0, &x1, &y1, &w, &h);
+  tft.getTextBounds("SNAPX", 0, 0, &x1, &y1, &w, &h);
   tft.setCursor((SCREEN_W - w) / 2, 26);
-  tft.print("CAMX");
+  tft.print("SNAPX");
 
   tft.setTextSize(1);
   tft.setTextColor(C_DIM);
@@ -259,7 +259,7 @@ void handleRoot() {
     "<!DOCTYPE html><html><head>"
     "<meta charset=\"utf-8\">"
     "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
-    "<title>CAMX</title><style>"
+    "<title>SNAPX</title><style>"
     "*{box-sizing:border-box;margin:0;padding:0}"
     "body{background:#08080a;color:#f4f4f6;min-height:100vh;"
     "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;"
@@ -322,7 +322,7 @@ void handleRoot() {
     ".lbclose:hover{color:#f4f4f6}"
     "</style></head><body>"
     "<header><span class=\"dot\"></span>"
-    "<span class=\"logo\">CAMX</span>"
+    "<span class=\"logo\">SNAPX</span>"
     "<span class=\"sub\">GALLERY</span>"
     "<span class=\"count\">" + String(count) + " photo" +
     String(count == 1 ? "" : "s") + "</span></header><main>";
