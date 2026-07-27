@@ -21,7 +21,7 @@ A handheld camera built on an ESP32-CAM. Live preview on a 1.8 inch TFT, a real 
 | ESP32-CAM-MB programmer | Type-C, handles flashing so the camera module stays seated |
 | 1.8" ST7735S SPI TFT | 128x160, 4-wire SPI. The module's own SD slot is unused |
 | 12mm momentary push button | Metal, prewired, 1NO |
-| 18650 cell + power bank enclosure | Type-C in, 5V USB out into the board's micro USB |
+| 18650 cell + power bank enclosure | Type-C in, 5V USB C out into the board |
 
 ## Wiring
 
@@ -69,7 +69,7 @@ The classic ESP32-CAM has no auto reset circuit. If you are flashing without the
 
 1. Power it up. You get a splash screen, then a boot report for storage, network and sensor.
 2. Point it, press the button. Flash fires, screen freezes on the shot, and it saves.
-3. To get photos off it, connect to the WiFi network `SNAPX` (password `1523`) and open `http://192.168.4.1/` in a browser.
+3. To get photos off it, connect to the WiFi network `SNAPX` (password `snapx1523`) and open `http://192.168.4.1/` in a browser.
 
 The gallery gives you a grid of every photo on the device. Click one for a full size view with arrow key navigation and a download button, or delete straight from the grid.
 
@@ -92,6 +92,10 @@ Photos live on internal flash rather than an SD card. The pins that would be nee
 - Fix the saved photo orientation
 - Long press to browse the gallery on the device screen
 - Proper enclosure
+
+
+## Build By
+Eben Siyabalapitiya
 
 ## License
 
