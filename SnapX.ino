@@ -18,9 +18,37 @@
 SPIClass tftSPI(HSPI);
 Adafruit_ST7735 tft = Adafruit_ST7735(&tftSPI, TFT_CS, TFT_DC, TFT_RST);
 
-#define FRAME_W 160
-#define FRAME_H 120
-#define Y_OFFSET ((128 - FRAME_H) / 2)
+#define SCREEN_W 128
+#define SCREEN_H 160
+#define FRAME_W 320
+#define FRAME_H 240
+
+void drawFrameToScreen(camera_fb_t *fb) {
+  if (fb->width != FRAME_W || fb->height != FRAME_H) return;
+  uint16_t *pixels = (uint16_t *)fb->buf;
+  static uint16_t rowBuf[SCREEN_W];
+
+  static int xMap[SCREEN_W];
+  static bool xMapReady = false;
+  if (!xMapReady) {
+    for (int x = 0; x < SCREEN_W; x++) {
+      xMap[x] = (x * FRAME_W) / SCREEN_W;
+    }
+    xMapReady = true;
+  }
+
+  tft.startWrite();
+  tft.setAddrWindow(0, 0, SCREEN_W, SCREEN_H);
+  for (int y = 0; y < SCREEN_H; y++) {
+    int srcY = (y * FRAME_H) / SCREEN_H;
+    uint16_t *srcRow = pixels + srcY * FRAME_W;
+    for (int x = 0; x < SCREEN_W; x++) {
+      rowBuf[x] = srcRow[xMap[x]];
+    }
+    tft.writePixels(rowBuf, SCREEN_W, true, true);
+  }
+  tft.endWrite();
+}
 
 #define PWDN_GPIO_NUM   32
 #define RESET_GPIO_NUM  -1
@@ -46,7 +74,7 @@ Adafruit_ST7735 tft = Adafruit_ST7735(&tftSPI, TFT_CS, TFT_DC, TFT_RST);
 #define DEBOUNCE_MS    50
 
 #define PHOTO_DIR    "/photos"
-#define JPEG_QUALITY 12
+#define JPEG_QUALITY 85
 
 #define AP_SSID     "CAMX-Photos"
 #define AP_PASSWORD "camera123"
@@ -70,6 +98,7 @@ void showStatus(const char *text);
 void startWebServer();
 void handleRoot();
 void handlePhotoFile();
+void handleDeletePhoto();
 
 void setup() {
   WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
@@ -84,7 +113,7 @@ void setup() {
   tftSPI.begin(TFT_SCLK, -1, TFT_MOSI, -1);
 
   tft.initR(INITR_BLACKTAB);
-  tft.setRotation(1);
+  tft.setRotation(2);
   tft.fillScreen(ST77XX_BLACK);
   tft.setSPISpeed(27000000);
 
@@ -116,6 +145,7 @@ void startWebServer() {
   Serial.println("\" then visit http://192.168.4.1/");
 
   server.on("/", handleRoot);
+  server.on("/delete", handleDeletePhoto);
   server.onNotFound(handlePhotoFile);
   server.begin();
 }
@@ -132,37 +162,85 @@ void handleRoot() {
   }
 
   String html =
-    "<!DOCTYPE html><html><head><meta name=\"viewport\" "
-    "content=\"width=device-width, initial-scale=1\">"
-    "<title>CAMX Photos</title><style>"
-    "body{background:#111;color:#eee;font-family:sans-serif;margin:0;padding:20px;}"
-    "h1{font-size:20px;font-weight:500;margin:0 0 16px;}"
-    ".count{color:#888;font-size:14px;font-weight:400;margin-left:8px;}"
-    ".grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;}"
-    ".card{display:block;border-radius:10px;overflow:hidden;background:#1c1c1c;"
-    "border:1px solid #2a2a2a;text-decoration:none;}"
-    ".card img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;}"
-    ".card .name{padding:6px 8px;font-size:12px;color:#aaa;white-space:nowrap;"
-    "overflow:hidden;text-overflow:ellipsis;}"
-    ".empty{color:#888;padding:40px 0;text-align:center;}"
+    "<!DOCTYPE html><html><head>"
+    "<meta charset=\"utf-8\">"
+    "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
+    "<title>CAMX</title><style>"
+    "*{box-sizing:border-box;margin:0;padding:0}"
+    "body{background:#0c0c0e;color:#f2f2f4;"
+    "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;"
+    "-webkit-font-smoothing:antialiased;padding-bottom:48px}"
+    "header{position:sticky;top:0;z-index:10;background:rgba(12,12,14,.85);"
+    "backdrop-filter:blur(12px);border-bottom:1px solid #1e1e22;"
+    "padding:18px 20px;display:flex;align-items:baseline;gap:10px}"
+    ".logo{font-size:17px;font-weight:650;letter-spacing:.14em}"
+    ".dot{width:7px;height:7px;border-radius:50%;background:#4ade80;"
+    "align-self:center;box-shadow:0 0 8px #4ade80}"
+    ".count{margin-left:auto;font-size:13px;color:#6f6f7a;"
+    "font-variant-numeric:tabular-nums}"
+    "main{padding:20px;max-width:1100px;margin:0 auto}"
+    ".grid{display:grid;gap:14px;"
+    "grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}"
+    ".card{position:relative;border-radius:14px;overflow:hidden;"
+    "background:#151518;border:1px solid #232329;"
+    "transition:transform .18s ease,border-color .18s ease}"
+    ".card:hover{transform:translateY(-2px);border-color:#34343d}"
+    ".card img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;"
+    "background:#1c1c21}"
+    ".meta{padding:9px 11px;font-size:12px;color:#8a8a95;"
+    "display:flex;justify-content:space-between;align-items:center;"
+    "font-variant-numeric:tabular-nums}"
+    ".del{position:absolute;top:8px;right:8px;width:26px;height:26px;"
+    "border-radius:8px;background:rgba(10,10,12,.72);color:#fb7185;"
+    "display:flex;align-items:center;justify-content:center;"
+    "font-size:15px;line-height:1;text-decoration:none;font-weight:600;"
+    "opacity:0;transition:opacity .18s ease,background .18s ease}"
+    ".card:hover .del{opacity:1}"
+    ".del:hover{background:#fb7185;color:#0c0c0e}"
+    "@media(hover:none){.del{opacity:1}}"
+    ".empty{text-align:center;padding:80px 20px;color:#5c5c66}"
+    ".empty .big{font-size:15px;color:#8a8a95;margin-bottom:6px}"
+    ".empty .sub{font-size:13px}"
     "</style></head><body>"
-    "<h1>CAMX Photos<span class=\"count\">" + String(count) + "</span></h1>";
+    "<header><span class=\"dot\"></span>"
+    "<span class=\"logo\">CAMX</span>"
+    "<span class=\"count\">" + String(count) + " photo" +
+    String(count == 1 ? "" : "s") + "</span></header><main>";
 
   if (count == 0) {
-    html += "<div class=\"empty\">No photos yet - take one!</div>";
+    html += "<div class=\"empty\"><div class=\"big\">Nothing here yet</div>"
+            "<div class=\"sub\">Press the shutter button to take your first shot.</div></div>";
   } else {
     html += "<div class=\"grid\">";
     for (int i = count - 1; i >= 0; i--) {
       String url = "/photos/" + names[i];
-      html += "<a class=\"card\" href=\"" + url + "\" target=\"_blank\">"
-              "<img src=\"" + url + "\" loading=\"lazy\">"
-              "<div class=\"name\">" + names[i] + "</div></a>";
+      String label = names[i];
+      label.replace("img_", "");
+      label.replace(".jpg", "");
+      html += "<div class=\"card\">"
+              "<a class=\"del\" href=\"/delete?f=" + names[i] + "\" "
+              "onclick=\"return confirm('Delete this photo?')\">&times;</a>"
+              "<a href=\"" + url + "\" target=\"_blank\">"
+              "<img src=\"" + url + "\" loading=\"lazy\"></a>"
+              "<div class=\"meta\"><span>#" + label + "</span></div>"
+              "</div>";
     }
     html += "</div>";
   }
 
-  html += "</body></html>";
+  html += "</main></body></html>";
   server.send(200, "text/html", html);
+}
+
+void handleDeletePhoto() {
+  if (server.hasArg("f")) {
+    String name = server.arg("f");
+    if (name.indexOf('/') == -1 && name.indexOf("..") == -1) {
+      LittleFS.remove(String(PHOTO_DIR) + "/" + name);
+    }
+  }
+  server.sendHeader("Location", "/");
+  server.send(302, "text/plain", "");
 }
 
 void handlePhotoFile() {
@@ -198,7 +276,7 @@ void startCamera() {
   config.pin_reset = RESET_GPIO_NUM;
   config.xclk_freq_hz = 20000000;
   config.pixel_format = PIXFORMAT_RGB565;
-  config.frame_size = FRAMESIZE_QQVGA;
+  config.frame_size = FRAMESIZE_QVGA;
   config.fb_location = CAMERA_FB_IN_PSRAM;
   config.fb_count = 2;
   config.grab_mode = CAMERA_GRAB_LATEST;
@@ -217,12 +295,7 @@ void loop() {
   camera_fb_t *fb = esp_camera_fb_get();
   if (!fb) return;
 
-  if (fb->width == FRAME_W && fb->height == FRAME_H) {
-    tft.startWrite();
-    tft.setAddrWindow(0, Y_OFFSET, FRAME_W, FRAME_H);
-    tft.writePixels((uint16_t *)fb->buf, fb->width * fb->height, true, true);
-    tft.endWrite();
-  }
+  drawFrameToScreen(fb);
 
   esp_camera_fb_return(fb);
 }
@@ -253,7 +326,6 @@ void capturePhoto() {
   if (stale) {
     esp_camera_fb_return(stale);
   }
-
   camera_fb_t *fb = esp_camera_fb_get();
   ledcWrite(FLASH_LED_PIN, 0);
 
@@ -261,12 +333,7 @@ void capturePhoto() {
     return;
   }
 
-  if (fb->width == FRAME_W && fb->height == FRAME_H) {
-    tft.startWrite();
-    tft.setAddrWindow(0, Y_OFFSET, FRAME_W, FRAME_H);
-    tft.writePixels((uint16_t *)fb->buf, fb->width * fb->height, true, true);
-    tft.endWrite();
-  }
+  drawFrameToScreen(fb);
   delay(1000);
 
   if (!fsReady) {
@@ -296,10 +363,9 @@ void capturePhoto() {
     Serial.println("JPEG encode failed");
   }
 
+  esp_camera_fb_return(fb);
   showStatus(ok ? "SAVED" : "SAVE FAIL");
   delay(1000);
-
-  esp_camera_fb_return(fb);
 }
 
 void showStatus(const char *text) {
