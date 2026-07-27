@@ -131,6 +131,7 @@ void setup() {
 }
 
 void splashScreen() {
+  tft.setRotation((SCREEN_ROTATION + 2) % 4);
   tft.fillScreen(C_BG);
 
   tft.drawRoundRect(6, 6, SCREEN_W - 12, SCREEN_H - 12, 8, C_PANEL);
@@ -155,9 +156,12 @@ void splashScreen() {
     tft.drawFastHLine(barX, barY, i, C_ACCENT);
     delay(6);
   }
+
+  tft.setRotation(SCREEN_ROTATION);
 }
 
 void bootLine(const char *label, const char *value, uint16_t color, int y) {
+  tft.setRotation((SCREEN_ROTATION + 2) % 4);
   tft.fillRect(12, y, SCREEN_W - 24, 10, C_BG);
   tft.setTextSize(1);
   tft.setTextColor(C_DIM);
@@ -168,8 +172,10 @@ void bootLine(const char *label, const char *value, uint16_t color, int y) {
   uint16_t w, h;
   tft.getTextBounds(value, 0, 0, &x1, &y1, &w, &h);
   tft.setTextColor(color);
-  tft.setCursor(SCREEN_W - 16 - w, y + 1);
+tft.setCursor(SCREEN_W - 16 - w, y + 1);
   tft.print(value);
+
+  tft.setRotation(SCREEN_ROTATION);
 }
 
 void toast(const char *text, uint16_t accent) {
