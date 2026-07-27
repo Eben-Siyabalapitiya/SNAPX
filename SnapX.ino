@@ -173,6 +173,8 @@ void bootLine(const char *label, const char *value, uint16_t color, int y) {
 }
 
 void toast(const char *text, uint16_t accent) {
+  tft.setRotation((SCREEN_ROTATION + 2) % 4);
+
   int boxH = 22;
   int boxY = SCREEN_H - boxH - 8;
   int boxX = 10;
@@ -189,9 +191,13 @@ void toast(const char *text, uint16_t accent) {
   tft.getTextBounds(text, 0, 0, &x1, &y1, &w, &h);
   tft.setCursor(boxX + (boxW - w) / 2, boxY + (boxH - h) / 2);
   tft.print(text);
+
+  tft.setRotation(SCREEN_ROTATION);
 }
 
 void fullStatus(const char *title, const char *sub, uint16_t accent) {
+  tft.setRotation((SCREEN_ROTATION + 2) % 4);
+
   tft.fillScreen(C_BG);
   tft.drawRoundRect(6, 6, SCREEN_W - 12, SCREEN_H - 12, 8, C_PANEL);
 
@@ -209,6 +215,8 @@ void fullStatus(const char *title, const char *sub, uint16_t accent) {
   tft.getTextBounds(sub, 0, 0, &x1, &y1, &w, &h);
   tft.setCursor((SCREEN_W - w) / 2, SCREEN_H / 2 + 8);
   tft.print(sub);
+
+  tft.setRotation(SCREEN_ROTATION);
 }
 
 void startWebServer() {
