@@ -14,7 +14,7 @@ Getting a live preview that was actually fast enough to use, and working around 
 fact that there were no pins left for an SD card, were the two hard parts. Both are
 written up further down.
 
-The full writeup, more photos and the demo videos are on my site:
+The full writeup, more photos and Info with some more demo videos are on my site:
 https://ebensiyabalapitiya.site/projects/snapx
 
 ## The build
