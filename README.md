@@ -85,6 +85,12 @@ Y9 35  Y8 34  Y7 39  Y6 36  Y5 21  Y4 19  Y3 18  Y2 5
 VSYNC 25  HREF 23  PCLK 22
 ```
 
+This is what it looks like wired up on the bench, before any of it goes in the
+case. Screen running off the board, jumpers to the ESP32-CAM-MB, power in over
+USB.
+
+![SNAPX wired up on the bench](docs/wiring-photo.png)
+
 ## Flashing
 
 Open `Firmware/SnapX/SnapX.ino` in the Arduino IDE.
