@@ -10,8 +10,9 @@ power bank that plugs into the board from outside the case.
 |---|---|---|
 | `Case.stl` | The main body of the enclosure. Roughly 66 x 53 x 30 mm. Has the screen window, the lens hole, the button hole, and the slot for the USB cable. | Yes, 1x |
 | `Cover.stl` | The faceted front panel that closes the case. About 3.8 mm thick. | Yes, 1x |
-| `Case.step` | The main body in STEP format. Open this if you want to change the design in another CAD program. | No |
-| `Cover.step` | The front panel in STEP format. | No |
+| `SNAPX-enclosure.step` | The full assembly in STEP format, both parts together. Open this if you want the whole thing in another CAD program. | No |
+| `Case.step` | Just the main body in STEP format. | No |
+| `Cover.step` | Just the front panel in STEP format. | No |
 
 ## Printing
 

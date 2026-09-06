@@ -176,10 +176,10 @@ created, which is getting the files back off the camera without pulling a card o
 
 The files are in [CAD/](CAD/), with a README in that folder that covers print
 settings. Print `Case.stl` and `Cover.stl` once each, PLA or PETG, 0.2 mm layers,
-3 walls, 15 to 20 percent infill, no supports. `Case.step` and `Cover.step` are
-there if you want to change the design in another CAD program. The battery is a
-USB power bank that stays outside, so the case only has to hold the board, the
-screen and the button.
+3 walls, 15 to 20 percent infill, no supports. `SNAPX-enclosure.step` is the full
+assembly if you want to change the design in another CAD program, and there are
+per part STEP files next to it. The battery is a USB power bank that stays
+outside, so the case only has to hold the board, the screen and the button.
 
 ## Known issues
 
