@@ -10,10 +10,8 @@ power bank that plugs into the board from outside the case.
 |---|---|---|
 | `Case.stl` | The main body of the enclosure. Roughly 66 x 53 x 30 mm. Has the screen window, the lens hole, the button hole, and the slot for the USB cable. | Yes, 1x |
 | `Cover.stl` | The faceted front panel that closes the case. About 3.8 mm thick. | Yes, 1x |
-| `SNAPX-enclosure.step` | The full CAD assembly in STEP format, both parts in one file. This is the file to open if you want to change the design in another CAD program. | No |
-
-If you see a `.PLACEHOLDER` file next to one of these names, that export has not
-been added yet. Open the placeholder file for what to do.
+| `Case.step` | The main body in STEP format. Open this if you want to change the design in another CAD program. | No |
+| `Cover.step` | The front panel in STEP format. | No |
 
 ## Printing
 
@@ -31,13 +29,13 @@ the cable slot.
 
 ## Exporting from Onshape again
 
-STEP (the whole thing):
+STEP, one file per part:
 
-1. Right click the Part Studio tab at the bottom of the window.
+1. Right click a part in the Parts list.
 2. Export.
-3. Format STEP. Save it as `SNAPX-enclosure.step`.
+3. Format STEP. Save as `Case.step` or `Cover.step`.
 
-STL (one file per part):
+STL, one file per part:
 
 1. Right click a part in the Parts list.
 2. Export.
