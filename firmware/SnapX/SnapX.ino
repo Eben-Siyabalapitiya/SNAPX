@@ -9,6 +9,16 @@
 #include <WiFi.h>
 #include <WebServer.h>
 
+// ===========================================================================
+//  USER CONFIG  -  change these before flashing
+// ===========================================================================
+//  The camera hosts its own WiFi access point that serves the photo gallery.
+//  Connect a phone or laptop to this network, then open http://192.168.4.1/
+//  AP_PASSWORD must be 8 to 63 characters for WPA2. Use "" for an open network.
+#define AP_SSID     "SNAPX"
+#define AP_PASSWORD "snapx1523"
+// ===========================================================================
+
 #define TFT_CS   13
 #define TFT_RST  -1
 #define TFT_DC   12
@@ -55,9 +65,6 @@ Adafruit_ST7735 tft = Adafruit_ST7735(&tftSPI, TFT_CS, TFT_DC, TFT_RST);
 
 #define PHOTO_DIR    "/photos"
 #define JPEG_QUALITY 95
-
-#define AP_SSID     "SNAPX"
-#define AP_PASSWORD "1523"
 
 WebServer server(80);
 

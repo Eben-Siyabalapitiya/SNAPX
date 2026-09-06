@@ -1,0 +1,45 @@
+# Arduino IDE build output
+/build/
+*.hex
+*.elf
+*.bin
+*.map
+*.d
+*.o
+*.a
+.build/
+build-*/
+
+# Arduino IDE local metadata
+*.pde.bak
+sketch.json.bak
+.vscode/arduino.json
+.vscode/c_cpp_properties.json
+
+# PlatformIO
+.pio/
+.pioenvs/
+.piolibdeps/
+lib/
+platformio-local.ini
+
+# LittleFS / SPIFFS filesystem images
+*.littlefs
+*.spiffs
+data/
+
+# Editor / OS cruft
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# CAD scratch files (keep the .step and .stl exports, drop the working files)
+*.f3d
+*.f3z
+*.FCStd1
+*~.FCStd
+*.bak
