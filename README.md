@@ -1,52 +1,53 @@
 # SNAPX
 
-SNAPX is a handheld digital camera built from scratch on an AI-Thinker ESP32-CAM.
-It has a live preview on a 1.8 inch TFT screen, a physical metal shutter button on
-the side, and a 3D printed enclosure designed in Onshape. Photos do not go to an SD
-card. They are saved to the ESP32's internal flash through LittleFS, and the camera
-hosts its own WiFi access point that serves a web gallery. You connect your phone to
-the camera's network, open `192.168.4.1`, and get a grid of every photo on the
-device with a lightbox view, download, and delete. This repository has everything
-needed to rebuild it: firmware, CAD, wiring, and a parts list.
+SNAPX is a small handheld camera I built on an ESP32-CAM. It has a live preview on
+a 1.8 inch screen, a real metal shutter button on the side, and a 3D printed case I
+designed in Onshape. When you press the button it takes a photo and saves it to the
+ESP32's own flash memory. There is no SD card. To get the photos off it, the camera
+makes its own WiFi network and hosts a small web gallery, so you connect your phone
+to it, open a page in the browser, and you can view, download or delete every photo
+on the device.
 
-Built by Eben Siyabalapitiya. Portfolio writeup:
+I made it because I wanted to build a camera from the sensor up instead of buying
+one, and the ESP32-CAM is cheap and already has most of what you need on it.
+Getting a live preview that was actually fast enough to use, and working around the
+fact that there were no pins left for an SD card, were the two hard parts. Both are
+written up further down.
+
+The full writeup, more photos and the demo videos are on my site:
 https://ebensiyabalapitiya.site/projects/snapx
 
-## Demo video
-
-TODO: paste YouTube link here
-
-<!-- Replace the line above with the full YouTube URL once the demo video is uploaded. -->
-
-## The finished build
+## The build
 
 ![SNAPX handheld camera](docs/cover.jpg)
 
-## Repository layout
+## What is in this repo
 
-| Path | Contents |
+| Folder | What is in it |
 |---|---|
-| `firmware/SnapX/SnapX.ino` | The full firmware, single Arduino sketch |
-| `cad/` | STEP and STL files for the enclosure, plus print notes |
-| `docs/` | Build photo and wiring diagram |
+| `Firmware/` | The firmware. One Arduino sketch at `Firmware/SnapX/SnapX.ino` |
+| `CAD/` | STL files for printing, and a STEP file of the whole case |
+| `PCB/` | Nothing. There is no custom PCB, there is a note in the folder saying so |
+| `docs/` | The build photo and the wiring diagram |
+| `BOM.csv` | Every part you need |
 
-## Bill of materials
+## Parts
 
-| Part | Details | Notes |
-|---|---|---|
-| AI-Thinker ESP32-CAM | Classic board, OV2640 2MP sensor | The board this whole project is built around |
-| ESP32-CAM-MB programmer board | Type-C, CH340G USB serial | Plugs onto the ESP32-CAM for flashing and power. Not strictly required, see the flashing notes |
-| 1.8 inch ST7735S SPI TFT | 128x160, 4-wire SPI | The module has its own microSD slot. It is not used in this build |
-| 12mm momentary metal push button | Waterproof, prewired, 1 normally open | The side shutter button |
-| 18650 cell in a Type-C power bank enclosure | 5V USB output | Powers the camera over USB. The cell lives outside the case, not inside it |
-| Onboard white LED on GPIO4 | Already on the ESP32-CAM | Used as the camera flash. Nothing to buy |
-| Jumper wire, solder | | For the screen and button connections |
-| 3D printed enclosure | See `cad/` | Holds the board, screen, and button only |
+The full list with notes is in [BOM.csv](BOM.csv). The short version:
+
+| Part | Notes |
+|---|---|
+| AI-Thinker ESP32-CAM | Classic board with the OV2640 sensor |
+| ESP32-CAM-MB programmer board | Plugs onto the ESP32-CAM, makes flashing easy |
+| 1.8 inch ST7735S SPI TFT | 128x160. The SD slot on it is not used |
+| 12mm metal push button | Momentary, prewired |
+| 18650 power bank enclosure and one 18650 cell | 5V USB out, sits outside the case |
+| Onboard white LED on GPIO4 | Already on the board, used as the flash |
+| Jumper wire and solder | For the screen and the button |
 
 ## Wiring
 
-A diagram is in [docs/wiring.svg](docs/wiring.svg). The tables below are the source
-of truth.
+![SNAPX wiring diagram](docs/wiring.svg)
 
 Screen to board:
 
@@ -59,36 +60,32 @@ Screen to board:
 | MOSI (SDA) | GPIO15 |
 | SCK | GPIO14 |
 | LED | 3.3V |
-| RESET | Not wired to a GPIO. `TFT_RST` is set to -1 in firmware |
+| RESET | Not wired. `TFT_RST` is set to -1 in the firmware |
 
-Shutter button:
+Button:
 
-| Button | Connection |
+| Button | Goes to |
 |---|---|
 | One leg | GPIO3 |
 | Other leg | GND |
 
-The button uses the ESP32 internal pullup and is debounced in software, so no
-external resistor is needed.
+No resistor needed. The firmware uses the internal pull-up and debounces the
+button in software.
 
-Flash:
+The flash is the white LED already on the board, on GPIO4.
 
-| | |
-|---|---|
-| Onboard white LED | GPIO4, driven on a PWM channel |
-
-Camera sensor. This is the standard AI-Thinker pin map. It is already handled in
-firmware and listed here only so you know which pins are taken:
+The camera sensor uses the standard AI-Thinker pin map. The firmware handles it,
+but it is the reason almost every pin is taken:
 
 ```
-PWDN 32   RESET -1   XCLK 0   SIOD 26   SIOC 27
-Y9 35   Y8 34   Y7 39   Y6 36   Y5 21   Y4 19   Y3 18   Y2 5
-VSYNC 25   HREF 23   PCLK 22
+PWDN 32  RESET -1  XCLK 0  SIOD 26  SIOC 27
+Y9 35  Y8 34  Y7 39  Y6 36  Y5 21  Y4 19  Y3 18  Y2 5
+VSYNC 25  HREF 23  PCLK 22
 ```
 
 ## Flashing
 
-Open `firmware/SnapX/SnapX.ino` in the Arduino IDE.
+Open `Firmware/SnapX/SnapX.ino` in the Arduino IDE.
 
 Board settings:
 
@@ -98,109 +95,100 @@ Board settings:
 | PSRAM | Enabled |
 | Partition Scheme | Huge APP (3MB No OTA / 1MB SPIFFS) |
 
-Libraries to install from the Library Manager:
+Install these two libraries from the Library Manager:
 
 - Adafruit GFX Library
 - Adafruit ST7735 and ST7789 Library
 
-`esp_camera`, `LittleFS`, `WiFi`, and `WebServer` all ship with the ESP32 Arduino
-core. There is nothing else to install.
+`esp_camera`, `LittleFS`, `WiFi` and `WebServer` already come with the ESP32 board
+package, so there is nothing else to add.
 
-Change the WiFi name and password if you want to. They are at the top of
-`firmware/SnapX/SnapX.ino` in a block marked `USER CONFIG`:
+The WiFi name and password are at the top of the sketch in a block marked
+`USER CONFIG`. Change them if you want:
 
 ```c
 #define AP_SSID     "SNAPX"
 #define AP_PASSWORD "snapx1523"
 ```
 
-`AP_PASSWORD` must be 8 to 63 characters for WPA2. Use `""` for an open network.
+The password has to be 8 to 63 characters or WPA2 will not take it. Set it to `""`
+for an open network.
 
-### Gotcha 1: GPIO0 has to be grounded during a reset
+Two things that got me while building this:
 
-The classic ESP32-CAM has no USB port and no auto reset circuit. The ESP32-CAM-MB
-programmer board handles this for you. If you are flashing without it, you have to
-tie GPIO0 to GND before the chip resets, start the upload, and then disconnect
-GPIO0 from GND after flashing so the board boots your code instead of the
-bootloader.
-
-### Gotcha 2: pick the right board profile
-
-Select **AI Thinker ESP32-CAM** as the board. If you select the generic **ESP32 Dev
-Module** profile instead, PSRAM is left disabled, and the camera then fails at init
-with a frame buffer malloc error. The camera needs PSRAM for its frame buffers.
+1. The classic ESP32-CAM has no USB port and no auto reset. The ESP32-CAM-MB board
+   handles that for you. If you flash without it, you have to connect GPIO0 to GND
+   before you reset the board, start the upload, then take GPIO0 off GND so it
+   boots your code instead of the bootloader.
+2. Pick "AI Thinker ESP32-CAM" as the board, not "ESP32 Dev Module". The generic
+   profile leaves PSRAM turned off, and then the camera will not start. It fails
+   with a frame buffer malloc error. The camera needs PSRAM for its buffers.
 
 ## Using it
 
-1. Plug in the power bank. You get a splash screen, then a short boot report for
-   storage, network, and sensor.
-2. Point the camera and press the side button. The flash LED fires, the screen
-   flashes white and freezes on the shot you just took, and it saves to flash.
-3. To pull photos off the device, connect your phone or laptop to the WiFi
-   network `SNAPX` with password `snapx1523`, then open `http://192.168.4.1/` in a
-   browser.
+1. Plug in the power bank. You get a splash screen and then a short readout saying
+   storage, network and sensor are up.
+2. Point it and press the button. The LED fires, the screen goes white for a
+   moment and freezes on the shot, then it saves.
+3. To get the photos, connect your phone or laptop to the WiFi network `SNAPX`
+   with the password `snapx1523`, then open `http://192.168.4.1/` in a browser.
 
-The gallery is a grid of every photo on the device. Click one for a full size
-lightbox with left and right navigation and a download button. Delete is the small
-control in the corner of each grid tile.
+The gallery shows every photo in a grid. Click one to see it full size with next
+and previous and a download button. There is a small delete button on each photo.
 
-## How the firmware works
+## How it works
 
-**The preview path never touches JPEG.** The camera is configured for
-`PIXFORMAT_RGB565` at QVGA, which is already the pixel format the ST7735 expects, so
-frames go from the camera buffer straight to the display with no decode step in
-between. The rotation and scaling from the 320x240 sensor frame to the 160x128 panel
-run off lookup tables that are built once on the first frame, not recalculated per
-pixel. This is the difference between roughly 0.1 fps and a usable preview.
+The preview never touches JPEG. The camera is set to RGB565 at QVGA, which is
+already the format the screen wants, so each frame goes straight from the camera to
+the display with no decoding step in between. The rotate and resize from the
+320x240 camera frame down to the 160x128 screen is done with lookup tables that get
+built once on the first frame, instead of being worked out for every pixel every
+time. Before I did that the preview ran at about 0.1 fps. After it, it is actually
+usable.
 
-**JPEG encoding happens only on shutter press.** On capture, the raw frame is run
-through `frame2jpg` at quality 95 and written to LittleFS under `/photos` as
-`img_00001.jpg` and up. On boot the firmware scans that directory to find the
-highest existing number, so the photo count and file numbering survive power
-cycles.
+JPEG only happens when you press the shutter. The frame gets encoded with
+`frame2jpg` at quality 95 and written to LittleFS under `/photos` as `img_00001.jpg`,
+`img_00002.jpg` and so on. On startup the firmware reads that folder to find the
+highest number, so the count keeps going after you unplug it.
 
-**Sensor tuning matters for image quality.** White balance, gain, exposure, and
-lens correction are off by default on the OV2640. Turning them on makes a large
-difference. Lens correction in particular fixes the dark corners.
+The OV2640 has white balance, gain, exposure and lens correction switched off by
+default. Turning them on made a big difference to how the photos look. Lens
+correction is the one that fixes the dark corners.
 
 ## Why there is no SD card
 
-This is the single most confusing design decision from the outside, so it is worth
-spelling out. The OV2640 camera sensor occupies almost every usable GPIO on the
-ESP32-CAM. The pins left over after the camera and the screen are the serial lines
-that the USB programmer uses, and one of those is the line the shutter button is on.
-There was physically nothing left for SD card chip select and MISO. So photos go to
-the ESP32's internal flash through LittleFS instead, and the WiFi gallery exists to
-solve the problem that this created, which is getting the files back off the device
-without a card reader.
+This is the part that confuses people, so it is worth explaining. The camera sensor
+uses almost every usable pin on the ESP32-CAM. The few that are left are the serial
+lines the USB programmer needs, and one of those is where the shutter button is.
+There were no pins left for SD card chip select and MISO. So photos go to the
+internal flash instead, and the WiFi gallery is there to solve the problem that
+created, which is getting the files back off the camera without pulling a card out.
 
-## Enclosure
+## Case
 
-The CAD is in [cad/](cad/), along with a separate README in that folder covering
-which file to print and with what settings. In short: print `SNAPX-body.stl` and
-`SNAPX-cover.stl` once each in PLA or PETG at 0.2 mm layer height, 3 walls, 15 to 20
-percent infill, no supports if the body is printed with the screen opening facing
-up. The `SNAPX-enclosure.step` file is the full design for anyone who wants to
-modify it. The battery is a USB power bank that sits outside the case, so the
-enclosure only has to hold the board, the screen, and the button.
+The files are in [CAD/](CAD/), with a README in that folder that covers print
+settings. Print `Case.stl` and `Cover.stl` once each, PLA or PETG, 0.2 mm layers,
+3 walls, 15 to 20 percent infill, no supports. `SNAPX-enclosure.step` is the whole
+case in one file if you want to change the design. The battery is a USB power bank
+that stays outside, so the case only has to hold the board, the screen and the
+button.
 
 ## Known issues
 
-- Saved photos come out rotated 90 degrees relative to the preview. The preview is
-  rotated in software for framing, and the JPEG encoder is handed the raw sensor
-  buffer, so the file and the on-screen image do not match orientation.
-- Preview frame rate is capped by how fast the panel can be written over SPI. It is
-  fine for framing a shot. It is not smooth video.
-- The brownout detector is disabled at boot. If you power the board from something
-  that sags under load, you get glitches that look like display bugs but are
-  actually the supply dropping.
-- The gallery lists at most 200 photos. Older photos past that count are still on
-  flash and still served if you know the URL, they just do not appear in the grid.
-- The gallery has no login. Anyone connected to the `SNAPX` WiFi network can view,
-  download, and delete every photo. The only barrier is the WiFi password.
-- There is no way to review photos on the device screen yet. You need the web
-  gallery.
+- Saved photos come out rotated 90 degrees from what you saw in the preview. The
+  preview is rotated in software and the encoder is handed the raw frame, so the
+  two do not match. This is on my list to fix.
+- The preview is only as fast as the screen can be written over SPI. It is fine for
+  lining up a shot. It is not smooth video.
+- The brownout detector is turned off at startup. If you power the camera from
+  something that dips under load, you get glitches that look like screen bugs but
+  are really the power dropping.
+- The gallery only lists the first 200 photos. Anything past that is still saved
+  and still downloads if you type the URL, it just does not show in the grid.
+- The gallery has no password of its own. Anyone on the `SNAPX` WiFi can view and
+  delete the photos. The WiFi password is the only thing in the way.
+- You cannot look back at photos on the camera screen yet, only in the web gallery.
 
 ## License
 
-MIT. See [LICENSE](LICENSE). Copyright Eben Siyabalapitiya.
+MIT, see [LICENSE](LICENSE). Copyright Eben Siyabalapitiya.

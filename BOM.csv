@@ -1,0 +1,11 @@
+Part,Description,Quantity,Notes
+AI-Thinker ESP32-CAM,Classic ESP32-CAM board with the OV2640 2MP sensor,1,The board the whole project runs on
+ESP32-CAM-MB programmer board,Type-C USB to serial adapter with the CH340G chip that the ESP32-CAM plugs into,1,Used for flashing and for power. You can flash without it but it is a lot easier with it
+1.8 inch ST7735S SPI TFT display,128x160 colour LCD with a 4-wire SPI interface,1,The module has its own microSD slot but it is not used in this build
+12mm momentary push button,Metal waterproof push button with pre-soldered wires and one normally-open contact,1,The shutter button on the side of the case
+18650 power bank enclosure,Type-C power bank shell that takes one 18650 cell and outputs 5V over USB,1,Holds the battery. It sits outside the case and plugs into the board with a USB cable
+18650 lithium cell,Single 3.7V 18650 rechargeable cell,1,Goes in the power bank shell
+Onboard white LED,The white LED already fitted to the ESP32-CAM on GPIO4,0,Already on the board so there is nothing to buy. Used as the flash
+Jumper wire,Thin hookup wire for the screen and button connections,1,A small amount
+Solder,Standard electronics solder,1,For the screen and button joints
+3D printed case,Printed from Case.stl and Cover.stl in the CAD folder,1,PLA or PETG
