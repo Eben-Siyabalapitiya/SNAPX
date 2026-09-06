@@ -23,11 +23,13 @@ https://ebensiyabalapitiya.site/projects/snapx
 
 ## What is in this repo
 
+There is no custom PCB. SNAPX is off-the-shelf modules wired together by hand,
+so the wiring diagram below is the whole electrical side of it.
+
 | Folder | What is in it |
 |---|---|
 | `Firmware/` | The firmware. One Arduino sketch at `Firmware/SnapX/SnapX.ino` |
 | `CAD/` | STL files for printing, and a STEP file of the whole case |
-| `PCB/` | Nothing. There is no custom PCB, there is a note in the folder saying so |
 | `docs/` | The build photo and the wiring diagram |
 | `BOM.csv` | Every part you need |
 
