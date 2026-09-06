@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="600" viewBox="0 0 860 600" font-family="-apple-system,Segoe UI,Helvetica,Arial,sans-serif">
+  <rect x="0" y="0" width="860" height="600" fill="#ffffff"/>
+  <text x="30" y="40" font-size="22" font-weight="700" fill="#111827">SNAPX wiring</text>
+  <text x="30" y="63" font-size="13" fill="#6b7280">AI-Thinker ESP32-CAM. The OV2640 camera sensor uses the standard AI-Thinker pin map and is not shown.</text>
+
+  <!-- ESP32-CAM board -->
+  <rect x="560" y="90" width="270" height="430" rx="10" fill="#f3f4f6" stroke="#9ca3af" stroke-width="1.5"/>
+  <text x="695" y="118" font-size="15" font-weight="700" fill="#111827" text-anchor="middle">ESP32-CAM</text>
+  <g font-size="13" fill="#111827">
+    <rect x="560" y="150" width="74" height="26" fill="#ffffff" stroke="#9ca3af"/><text x="571" y="168">3.3V</text>
+    <rect x="560" y="196" width="74" height="26" fill="#ffffff" stroke="#9ca3af"/><text x="571" y="214">GND</text>
+    <rect x="560" y="242" width="74" height="26" fill="#ffffff" stroke="#9ca3af"/><text x="567" y="260">GPIO13</text>
+    <rect x="560" y="288" width="74" height="26" fill="#ffffff" stroke="#9ca3af"/><text x="567" y="306">GPIO12</text>
+    <rect x="560" y="334" width="74" height="26" fill="#ffffff" stroke="#9ca3af"/><text x="567" y="352">GPIO15</text>
+    <rect x="560" y="380" width="74" height="26" fill="#ffffff" stroke="#9ca3af"/><text x="567" y="398">GPIO14</text>
+    <rect x="560" y="446" width="74" height="26" fill="#ffffff" stroke="#9ca3af"/><text x="571" y="464">GPIO3</text>
+  </g>
+  <text x="642" y="500" font-size="12" fill="#6b7280">GPIO4 flash LED is onboard</text>
+
+  <!-- ST7735 TFT -->
+  <rect x="40" y="90" width="230" height="330" rx="10" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="155" y="118" font-size="15" font-weight="700" fill="#3730a3" text-anchor="middle">1.8" ST7735 TFT</text>
+  <g font-size="13" fill="#1e1b4b" text-anchor="end">
+    <text x="255" y="168">VCC</text>
+    <text x="255" y="214">GND</text>
+    <text x="255" y="260">CS</text>
+    <text x="255" y="306">DC (A0)</text>
+    <text x="255" y="352">MOSI (SDA)</text>
+    <text x="255" y="398">SCK</text>
+  </g>
+  <g font-size="11" fill="#6b7280" text-anchor="middle">
+    <text x="155" y="392">LED pin also to 3.3V</text>
+    <text x="155" y="408">RESET not wired, TFT_RST = -1</text>
+  </g>
+
+  <!-- Button -->
+  <rect x="40" y="450" width="230" height="70" rx="10" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+  <text x="155" y="478" font-size="15" font-weight="700" fill="#065f46" text-anchor="middle">Shutter button</text>
+  <text x="255" y="500" font-size="13" fill="#064e3b" text-anchor="end">leg A</text>
+  <text x="155" y="514" font-size="11" fill="#6b7280" text-anchor="middle">leg B to GND, internal pullup, no resistor</text>
+
+  <!-- connection lines -->
+  <g stroke-width="2" fill="none">
+    <path d="M260 163 H560" stroke="#ef4444"/>
+    <path d="M260 209 H560" stroke="#111827"/>
+    <path d="M260 255 H560" stroke="#6366f1"/>
+    <path d="M260 301 H560" stroke="#6366f1"/>
+    <path d="M260 347 H560" stroke="#6366f1"/>
+    <path d="M260 393 H560" stroke="#6366f1"/>
+    <path d="M260 485 H480 Q500 485 500 465 L500 459 H560" stroke="#10b981"/>
+  </g>
+  <text x="405" y="479" font-size="11" fill="#059669" text-anchor="middle">GPIO3 is also the programmer's serial RX line</text>
+
+  <!-- legend -->
+  <g font-size="12" fill="#374151">
+    <rect x="40" y="560" width="14" height="10" fill="#ef4444"/><text x="60" y="569">power</text>
+    <rect x="120" y="560" width="14" height="10" fill="#111827"/><text x="140" y="569">ground</text>
+    <rect x="205" y="560" width="14" height="10" fill="#6366f1"/><text x="225" y="569">SPI / data</text>
+    <rect x="310" y="560" width="14" height="10" fill="#10b981"/><text x="330" y="569">button</text>
+  </g>
+</svg>

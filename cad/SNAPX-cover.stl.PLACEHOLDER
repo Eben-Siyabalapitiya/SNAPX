@@ -1,0 +1,11 @@
+PLACEHOLDER - not a real file.
+
+Replace this with the STL export of the back cover part.
+
+In Onshape: right click the cover part in the Parts list -> Export ->
+Format STL, Binary, units mm. Save in this folder as exactly:
+
+    SNAPX-cover.stl
+
+Then delete this .PLACEHOLDER file. If your Part Studio names the part
+something else, keep your name but update cad/README.md to match.
